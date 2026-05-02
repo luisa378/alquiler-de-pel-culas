@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis peliculas</title>
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel">
+        <div>
+          <p class="eyebrow">Peliculas</p>
+          <h1>Mis peliculas</h1>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <h2>Login</h2>
+
+          <label>
+            Email
+            <input id="email" type="email" value="user1@gmail.com" required />
+          </label>
+
+          <label>
+            Password
+            <input id="password" type="password" value="pass" required />
+          </label>
+
+          <div class="actions">
+            <button type="submit">Entrar</button>
+            <button type="button" id="logout-button" class="secondary">Salir</button>
+          </div>
+
+          <p id="login-status" class="form-status">No has iniciado sesion.</p>
+        </form>
+
+        <form id="movie-form" class="movie-form hidden">
+          <h2>Gestion</h2>
+          <input type="hidden" id="movie-id" />
+
+          <label>
+            Titulo
+            <input id="title" type="text" placeholder="Ej. Interstellar" required />
+          </label>
+
+          <label>
+            Anio
+            <input id="year" type="number" placeholder="Ej. 2014" required />
+          </label>
+
+          <label>
+            Genero
+            <input id="genre" type="text" placeholder="Ej. Ciencia ficcion" required />
+          </label>
+
+          <div class="actions">
+            <button type="submit" id="save-button">Guardar</button>
+            <button type="button" id="cancel-button" class="secondary">Cancelar</button>
+          </div>
+        </form>
+      </section>
+
+      <div class="content">
+        <section id="admin-movies-section" class="list-section hidden">
+          <div class="section-header">
+            <h2>Gestion de peliculas</h2>
+            <span id="status" class="status">Inicia sesion como admin</span>
+          </div>
+
+          <div id="movie-list" class="movie-list"></div>
+        </section>
+
+        <section id="user-available-section" class="list-section hidden">
+          <div class="section-header">
+            <h2>Disponibles para alquilar</h2>
+            <span id="available-status" class="status">Inicia sesion</span>
+          </div>
+
+          <div id="available-list" class="movie-list"></div>
+        </section>
+
+        <section id="user-rented-section" class="list-section hidden">
+          <div class="section-header">
+            <h2>Mis peliculas alquiladas</h2>
+            <span id="rented-status" class="status">Inicia sesion</span>
+          </div>
+
+          <div id="rented-list" class="movie-list"></div>
+        </section>
+
+        <section id="admin-rentals-section" class="list-section hidden">
+          <div class="section-header">
+            <h2>Alquileres de usuarios</h2>
+            <span id="all-rentals-status" class="status">Inicia sesion como admin</span>
+          </div>
+
+          <div id="all-rentals-list" class="movie-list"></div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
