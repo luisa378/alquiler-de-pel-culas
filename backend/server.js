@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
+const router = express.Router();
 const PORT = 3000;
 
 app.use(cors());
@@ -124,11 +125,11 @@ function buildRentalResponse(rental) {
   };
 }
 
-app.get("/", function (_req, res) {
+router.get("/", function (_req, res) {
   res.json({ message: "API de peliculas funcionando" });
 });
 
-app.post("/login", function (req, res) {
+router.post("/login", function (req, res) {
   const email = req.body.email;
   const password = req.body.password;
   const user = users.find(function (item) {
@@ -147,11 +148,11 @@ app.post("/login", function (req, res) {
   });
 });
 
-app.get("/movies", function (_req, res) {
+router.get("/movies", function (_req, res) {
   res.json(movies);
 });
 
-app.get("/movies/available", function (_req, res) {
+router.get("/movies/available", function (_req, res) {
   const rentedMovieIds = rentals.map(function (rental) {
     return rental.movieId;
   });
@@ -163,7 +164,7 @@ app.get("/movies/available", function (_req, res) {
   res.json(availableMovies);
 });
 
-app.get("/movies/:id", function (req, res) {
+router.get("/movies/:id", function (req, res) {
   const id = Number(req.params.id);
   const movie = findMovieById(id);
 
@@ -175,7 +176,7 @@ app.get("/movies/:id", function (req, res) {
   res.json(movie);
 });
 
-app.post("/movies", function (req, res) {
+router.post("/movies", function (req, res) {
   if (!requireAdmin(req, res)) {
     return;
   }
@@ -200,7 +201,7 @@ app.post("/movies", function (req, res) {
   res.status(201).json(newMovie);
 });
 
-app.put("/movies/:id", function (req, res) {
+router.put("/movies/:id", function (req, res) {
   if (!requireAdmin(req, res)) {
     return;
   }
@@ -243,7 +244,7 @@ app.put("/movies/:id", function (req, res) {
   res.json(updatedMovie);
 });
 
-app.delete("/movies/:id", function (req, res) {
+router.delete("/movies/:id", function (req, res) {
   if (!requireAdmin(req, res)) {
     return;
   }
@@ -267,7 +268,7 @@ app.delete("/movies/:id", function (req, res) {
   res.status(204).send();
 });
 
-app.post("/rentals", function (req, res) {
+router.post("/rentals", function (req, res) {
   const userId = Number(req.body.userId);
   const movieId = Number(req.body.movieId);
   const user = findUserById(userId);
@@ -308,7 +309,7 @@ app.post("/rentals", function (req, res) {
   res.status(201).json(buildRentalResponse(newRental));
 });
 
-app.get("/rentals", function (req, res) {
+router.get("/rentals", function (req, res) {
   if (!requireAdmin(req, res)) {
     return;
   }
@@ -322,7 +323,7 @@ app.get("/rentals", function (req, res) {
   res.json(rentalList);
 });
 
-app.get("/rentals/user/:userId", function (req, res) {
+router.get("/rentals/user/:userId", function (req, res) {
   const userId = Number(req.params.userId);
   const user = findUserById(userId);
 
@@ -343,6 +344,13 @@ app.get("/rentals/user/:userId", function (req, res) {
   res.json(userRentals);
 });
 
-app.listen(PORT, function () {
-  console.log("Servidor escuchando en http://localhost:" + PORT);
-});
+app.use("/", router);
+app.use("/api", router);
+
+if (require.main === module) {
+  app.listen(PORT, function () {
+    console.log("Servidor escuchando en http://localhost:" + PORT);
+  });
+}
+
+module.exports = app;
