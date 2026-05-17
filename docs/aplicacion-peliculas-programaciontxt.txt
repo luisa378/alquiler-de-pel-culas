@@ -1,0 +1,107 @@
+Aplicacion de peliculas - Documento tecnico
+
+Este documento resume los conceptos de programacion utilizados y explica brevemente el papel de cada fichero principal.
+
+Conceptos principales
+
+Frontend con TypeScript
+
+El cliente usa TypeScript para tener tipos en objetos como Movie, User y Rental. Esto ayuda a detectar errores antes de ejecutar la aplicacion.
+
+Vite
+
+Se usa como servidor de desarrollo y herramienta de build para el frontend. Permite arrancar la aplicacion rapidamente y compilar los ficheros TypeScript.
+
+Node.js y Express
+
+El backend esta construido con Node.js y Express. Express facilita crear endpoints HTTP como GET, POST, PUT y DELETE.
+
+API REST
+
+El servidor expone rutas para login, peliculas y alquileres. Cada ruta representa una accion concreta sobre los datos.
+
+CRUD
+
+El administrador puede crear, leer, actualizar y eliminar peliculas. Estas operaciones se implementan con POST, GET, PUT y DELETE.
+
+Datos en memoria
+
+Peliculas, usuarios y alquileres se guardan en arrays dentro del servidor. Esto simplifica la aplicacion, aunque los datos se pierden al reiniciar el backend.
+
+Roles
+
+Cada usuario tiene un rol. El rol admin permite gestionar peliculas y ver todos los alquileres. El rol user permite alquilar peliculas.
+
+Validacion
+
+Antes de crear o modificar una pelicula, el backend comprueba que titulo, anio, genero y categoria sean validos.
+
+Fetch
+
+El frontend se comunica con el backend usando fetch. No se usa async ni await; las respuestas se tratan con then y catch.
+
+DOM
+
+El frontend crea tarjetas de peliculas de forma dinamica usando document.createElement y actualiza el contenido de la pagina segun el estado.
+
+Estado en cliente
+
+El frontend guarda variables como currentUser, activeCategory, adminMovies, availableMovies y rentedMovies para saber que debe mostrar.
+
+Filtros combinados
+
+Las listas se filtran por categoria activa y por texto de busqueda. Esto se hace en el cliente sobre los arrays cargados desde el backend.
+
+CSS responsive
+
+La interfaz usa CSS Grid y media queries para adaptarse a distintos tamanos de pantalla.
+
+Explicacion de ficheros
+
+backend/package.json
+
+Define el proyecto backend, sus dependencias y scripts. Incluye express y cors. El script dev arranca el servidor con node --watch.
+
+backend/server.js
+
+Contiene toda la logica del servidor. Define usuarios, peliculas, alquileres, validaciones, roles y endpoints REST. Tambien genera posters SVG para las peliculas.
+
+frontend/package.json
+
+Define el proyecto frontend, sus dependencias y scripts. Incluye vite y typescript. El script dev arranca Vite.
+
+frontend/tsconfig.json
+
+Configuracion de TypeScript. Activa el modo strict y define las librerias necesarias para navegador y ES2020.
+
+frontend/index.html
+
+Estructura base de la pagina. Incluye el panel de login, formulario de gestion, navegador de categorias, buscador y secciones de peliculas.
+
+frontend/src/main.ts
+
+Fichero principal del frontend. Gestiona login, logout, filtros, renderizado de tarjetas, alquileres y llamadas fetch al backend.
+
+frontend/src/styles.css
+
+Contiene todos los estilos visuales. Define la apariencia oscura, la parrilla de posters, el buscador, botones, formularios y comportamiento responsive.
+
+README.md
+
+Documento de inicio rapido. Incluye descripcion de la aplicacion, usuarios de prueba e instrucciones para ejecutar backend y frontend.
+
+.gitignore
+
+Indica a Git que carpetas y ficheros no deben versionarse, como node_modules, builds, logs y ficheros de entorno.
+
+img/
+
+Carpeta con imagenes de referencia visual usadas para adaptar el estilo de la aplicacion.
+
+Flujo tecnico de alquiler
+
+1. El usuario inicia sesion y el frontend guarda currentUser.
+2. El frontend carga peliculas disponibles desde /movies/available.
+3. Al pulsar Alquilar, el frontend envia userId y movieId a POST /rentals.
+4. El backend comprueba usuario, rol, pelicula y que la pelicula no este ya alquilada.
+5. Si todo es correcto, se crea un alquiler en memoria y se refrescan las listas.

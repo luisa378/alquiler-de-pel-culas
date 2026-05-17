@@ -1,0 +1,56 @@
+Aplicacion de peliculas - Documento funcional
+
+La aplicacion permite consultar un catalogo de peliculas, buscar por titulo, filtrar por categorias, iniciar sesion con distintos roles y alquilar peliculas disponibles.
+
+Objetivo
+
+El objetivo principal es practicar una aplicacion web sencilla con frontend en TypeScript y backend en Node.js. La aplicacion simula una plataforma de peliculas con catalogo, login, gestion de peliculas y alquileres.
+
+Usuarios y roles
+
+Existen tres usuarios creados en memoria en el servidor.
+
+- Administrador: admin@gmail.com / admin. Puede crear, modificar y eliminar peliculas. Tambien puede ver todos los alquileres realizados por los usuarios.
+- Usuario 1: user1@gmail.com / pass. Puede ver peliculas disponibles, alquilar peliculas y consultar sus propias peliculas alquiladas.
+- Usuario 2: user2@gmail.com / pass2. Tiene los mismos permisos que el usuario 1.
+
+Catalogo publico
+
+Cuando no hay ningun usuario logado, la pagina muestra las peliculas disponibles en modo solo lectura. En este estado no aparece la accion de alquilar.
+
+Login
+
+El formulario de login permite introducir email y password. Si las credenciales son correctas, el servidor devuelve los datos basicos del usuario y su rol. Segun el rol, la interfaz muestra unas secciones u otras.
+
+Funcionamiento para usuarios normales
+
+- Ven la lista de peliculas disponibles para alquilar.
+- Pueden alquilar una pelicula usando el boton Alquilar.
+- Cuando una pelicula se alquila, deja de aparecer como disponible.
+- Pueden consultar la seccion Mis peliculas alquiladas.
+
+Funcionamiento para administrador
+
+- Puede dar de alta nuevas peliculas.
+- Puede modificar titulo, anio, genero y categoria.
+- Puede eliminar peliculas.
+- Puede consultar todos los alquileres realizados por los usuarios.
+
+Categorias
+
+La navegacion superior permite filtrar peliculas por categoria. Las categorias actuales son Nuevo, Popular, Deportes, Terror y Comedia. Cada pelicula pertenece a una categoria.
+
+Buscador
+
+El buscador permite filtrar peliculas por titulo. El filtro se combina con la categoria activa. Por ejemplo, si esta seleccionada la categoria Popular y se escribe Matrix, solo se muestran peliculas populares cuyo titulo contenga Matrix.
+
+Reglas de alquiler
+
+- Solo los usuarios con rol user pueden alquilar peliculas.
+- El administrador no puede alquilar peliculas.
+- Una pelicula solo puede estar alquilada una vez.
+- Si una pelicula se elimina, tambien se eliminan sus alquileres asociados.
+
+Aspecto visual
+
+La interfaz usa un estilo oscuro inspirado en aplicaciones de catalogo de peliculas: fondo oscuro, acento amarillo, buscador visible, filtros superiores y tarjetas en forma de poster.
