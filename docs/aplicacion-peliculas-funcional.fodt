@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+  <office:styles>
+    <style:style style:name="Title" style:family="paragraph">
+      <style:text-properties fo:font-size="22pt" fo:font-weight="bold"/>
+    </style:style>
+    <style:style style:name="Heading" style:family="paragraph">
+      <style:text-properties fo:font-size="16pt" fo:font-weight="bold"/>
+    </style:style>
+    <style:style style:name="Body" style:family="paragraph">
+      <style:text-properties fo:font-size="11pt"/>
+    </style:style>
+  </office:styles>
+  <office:body>
+    <office:text>
+      <text:p text:style-name="Title">Aplicacion de peliculas - Documento funcional</text:p>
+      <text:p text:style-name="Body">La aplicacion permite consultar un catalogo de peliculas, buscar por titulo, filtrar por categorias, iniciar sesion con distintos roles y alquilar peliculas disponibles.</text:p>
+
+      <text:p text:style-name="Heading">Objetivo</text:p>
+      <text:p text:style-name="Body">El objetivo principal es practicar una aplicacion web sencilla con frontend en TypeScript y backend en Node.js. La aplicacion simula una plataforma de peliculas con catalogo, login, gestion de peliculas y alquileres.</text:p>
+
+      <text:p text:style-name="Heading">Usuarios y roles</text:p>
+      <text:p text:style-name="Body">Existen tres usuarios creados en memoria en el servidor.</text:p>
+      <text:list>
+        <text:list-item><text:p text:style-name="Body">Administrador: admin@gmail.com / admin. Puede crear, modificar y eliminar peliculas. Tambien puede ver todos los alquileres realizados por los usuarios.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Usuario 1: user1@gmail.com / pass. Puede ver peliculas disponibles, alquilar peliculas y consultar sus propias peliculas alquiladas.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Usuario 2: user2@gmail.com / pass2. Tiene los mismos permisos que el usuario 1.</text:p></text:list-item>
+      </text:list>
+
+      <text:p text:style-name="Heading">Catalogo publico</text:p>
+      <text:p text:style-name="Body">Cuando no hay ningun usuario logado, la pagina muestra las peliculas disponibles en modo solo lectura. En este estado no aparece la accion de alquilar.</text:p>
+
+      <text:p text:style-name="Heading">Login</text:p>
+      <text:p text:style-name="Body">El formulario de login permite introducir email y password. Si las credenciales son correctas, el servidor devuelve los datos basicos del usuario y su rol. Segun el rol, la interfaz muestra unas secciones u otras.</text:p>
+
+      <text:p text:style-name="Heading">Funcionamiento para usuarios normales</text:p>
+      <text:list>
+        <text:list-item><text:p text:style-name="Body">Ven la lista de peliculas disponibles para alquilar.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Pueden alquilar una pelicula usando el boton Alquilar.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Cuando una pelicula se alquila, deja de aparecer como disponible.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Pueden consultar la seccion Mis peliculas alquiladas.</text:p></text:list-item>
+      </text:list>
+
+      <text:p text:style-name="Heading">Funcionamiento para administrador</text:p>
+      <text:list>
+        <text:list-item><text:p text:style-name="Body">Puede dar de alta nuevas peliculas.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Puede modificar titulo, anio, genero y categoria.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Puede eliminar peliculas.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Puede consultar todos los alquileres realizados por los usuarios.</text:p></text:list-item>
+      </text:list>
+
+      <text:p text:style-name="Heading">Categorias</text:p>
+      <text:p text:style-name="Body">La navegacion superior permite filtrar peliculas por categoria. Las categorias actuales son Nuevo, Popular, Deportes, Terror y Comedia. Cada pelicula pertenece a una categoria.</text:p>
+
+      <text:p text:style-name="Heading">Buscador</text:p>
+      <text:p text:style-name="Body">El buscador permite filtrar peliculas por titulo. El filtro se combina con la categoria activa. Por ejemplo, si esta seleccionada la categoria Popular y se escribe Matrix, solo se muestran peliculas populares cuyo titulo contenga Matrix.</text:p>
+
+      <text:p text:style-name="Heading">Reglas de alquiler</text:p>
+      <text:list>
+        <text:list-item><text:p text:style-name="Body">Solo los usuarios con rol user pueden alquilar peliculas.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">El administrador no puede alquilar peliculas.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Una pelicula solo puede estar alquilada una vez.</text:p></text:list-item>
+        <text:list-item><text:p text:style-name="Body">Si una pelicula se elimina, tambien se eliminan sus alquileres asociados.</text:p></text:list-item>
+      </text:list>
+
+      <text:p text:style-name="Heading">Aspecto visual</text:p>
+      <text:p text:style-name="Body">La interfaz usa un estilo oscuro inspirado en aplicaciones de catalogo de peliculas: fondo oscuro, acento amarillo, buscador visible, filtros superiores y tarjetas en forma de poster.</text:p>
+    </office:text>
+  </office:body>
+</office:document>

@@ -8,9 +8,12 @@
   <body>
     <main class="app">
       <section class="panel">
-        <div>
-          <p class="eyebrow">Peliculas</p>
-          <h1>Mis peliculas</h1>
+        <div class="brand">
+          <button type="button" class="icon-button" aria-label="Menu">☰</button>
+          <div>
+            <p class="eyebrow">MovieWatch</p>
+            <h1>Peliculas</h1>
+          </div>
         </div>
 
         <form id="login-form" class="login-form">
@@ -53,6 +56,17 @@
             <input id="genre" type="text" placeholder="Ej. Ciencia ficcion" required />
           </label>
 
+          <label>
+            Categoria
+            <select id="category" required>
+              <option value="Nuevo">Nuevo</option>
+              <option value="Popular">Popular</option>
+              <option value="Deportes">Deportes</option>
+              <option value="Terror">Terror</option>
+              <option value="Comedia">Comedia</option>
+            </select>
+          </label>
+
           <div class="actions">
             <button type="submit" id="save-button">Guardar</button>
             <button type="button" id="cancel-button" class="secondary">Cancelar</button>
@@ -61,6 +75,21 @@
       </section>
 
       <div class="content">
+        <section class="topbar">
+          <nav class="tabs" aria-label="Categorias">
+            <button type="button" class="tab-button" data-category="Nuevo">Nuevo</button>
+            <button type="button" class="tab-button active" data-category="Popular">Popular</button>
+            <button type="button" class="tab-button" data-category="Deportes">Deportes</button>
+            <button type="button" class="tab-button" data-category="Terror">Terror</button>
+            <button type="button" class="tab-button" data-category="Comedia">Comedia</button>
+          </nav>
+
+          <label class="search-box">
+            <input id="search-title" type="search" />
+            <span>Buscar</span>
+          </label>
+        </section>
+
         <section id="admin-movies-section" class="list-section hidden">
           <div class="section-header">
             <h2>Gestion de peliculas</h2>
@@ -70,10 +99,10 @@
           <div id="movie-list" class="movie-list"></div>
         </section>
 
-        <section id="user-available-section" class="list-section hidden">
+        <section id="user-available-section" class="list-section">
           <div class="section-header">
-            <h2>Disponibles para alquilar</h2>
-            <span id="available-status" class="status">Inicia sesion</span>
+            <h2>Peliculas disponibles</h2>
+            <span id="available-status" class="status">Cargando...</span>
           </div>
 
           <div id="available-list" class="movie-list"></div>

@@ -34,13 +34,3 @@ npm run dev
 ```
 
 Abre la URL que muestre Vite, normalmente `http://127.0.0.1:5173`.
-
-## Desplegar en Vercel
-
-El proyecto incluye `vercel.json` y una funcion serverless en `api/[...path].js`.
-
-- En local, el frontend llama a `http://localhost:3000`.
-- En Vercel, el frontend llama a `/api`.
-- El backend exporta la app de Express para Vercel y solo abre puerto cuando se ejecuta con `node server.js` o `npm run dev`.
-
-En Vercel puedes importar el repositorio y desplegarlo directamente desde la raiz del proyecto.

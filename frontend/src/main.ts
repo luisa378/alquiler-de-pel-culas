@@ -1,12 +1,14 @@
 import "./styles.css";
 
 type Role = "admin" | "user";
+type MovieCategory = "Nuevo" | "Popular" | "Deportes" | "Terror" | "Comedia";
 
 type Movie = {
   id: number;
   title: string;
   year: number;
   genre: string;
+  category: MovieCategory;
   imageUrl: string;
 };
 
@@ -20,10 +22,12 @@ type Rental = {
   id: number;
   userId: number;
   userEmail: string;
+  rentedAt: string;
+  availableUntil: string;
   movie: Movie;
 };
 
-const API_BASE_URL = import.meta.env.DEV ? "http://localhost:3000" : "/api";
+const API_BASE_URL = "http://localhost:3000";
 const MOVIES_URL = API_BASE_URL + "/movies";
 
 const form = document.querySelector("#movie-form") as HTMLFormElement;
@@ -32,6 +36,8 @@ const movieIdInput = document.querySelector("#movie-id") as HTMLInputElement;
 const titleInput = document.querySelector("#title") as HTMLInputElement;
 const yearInput = document.querySelector("#year") as HTMLInputElement;
 const genreInput = document.querySelector("#genre") as HTMLInputElement;
+const categoryInput = document.querySelector("#category") as HTMLSelectElement;
+const searchTitleInput = document.querySelector("#search-title") as HTMLInputElement;
 const emailInput = document.querySelector("#email") as HTMLInputElement;
 const passwordInput = document.querySelector("#password") as HTMLInputElement;
 const saveButton = document.querySelector("#save-button") as HTMLButtonElement;
@@ -50,8 +56,14 @@ const adminMoviesSection = document.querySelector("#admin-movies-section") as HT
 const userAvailableSection = document.querySelector("#user-available-section") as HTMLElement;
 const userRentedSection = document.querySelector("#user-rented-section") as HTMLElement;
 const adminRentalsSection = document.querySelector("#admin-rentals-section") as HTMLElement;
+const tabButtons = document.querySelectorAll(".tab-button") as NodeListOf<HTMLButtonElement>;
 
 let currentUser: User | null = null;
+let adminMovies: Movie[] = [];
+let availableMovies: Movie[] = [];
+let rentedRentals: Rental[] = [];
+let allRentals: Rental[] = [];
+let activeCategory: MovieCategory = "Popular";
 
 function isAdmin(): boolean {
   return Boolean(currentUser && currentUser.role === "admin");
@@ -83,6 +95,7 @@ function resetForm(): void {
   titleInput.value = "";
   yearInput.value = "";
   genreInput.value = "";
+  categoryInput.value = "Popular";
   saveButton.textContent = "Guardar";
 }
 
@@ -90,7 +103,8 @@ function getFormMovie(): Omit<Movie, "id" | "imageUrl"> {
   return {
     title: titleInput.value,
     year: Number(yearInput.value),
-    genre: genreInput.value
+    genre: genreInput.value,
+    category: categoryInput.value as MovieCategory
   };
 }
 
@@ -99,6 +113,7 @@ function fillForm(movie: Movie): void {
   titleInput.value = movie.title;
   yearInput.value = String(movie.year);
   genreInput.value = movie.genre;
+  categoryInput.value = movie.category;
   saveButton.textContent = "Actualizar";
 }
 
@@ -113,11 +128,81 @@ function updateVisibleSections(): void {
   showElement(form, adminLogged);
   showElement(adminMoviesSection, adminLogged);
   showElement(adminRentalsSection, adminLogged);
-  showElement(userAvailableSection, userLogged);
+  showElement(userAvailableSection, !adminLogged);
   showElement(userRentedSection, userLogged);
 }
 
-function createMovieCard(movie: Movie, mode: "crud" | "available" | "rented"): HTMLElement {
+function getSearchText(): string {
+  return searchTitleInput.value.trim().toLowerCase();
+}
+
+function filterMovies(movies: Movie[]): Movie[] {
+  const searchText = getSearchText();
+  return movies.filter(function (movie) {
+    const matchesCategory = movie.category === activeCategory;
+    const matchesTitle = searchText === "" || movie.title.toLowerCase().includes(searchText);
+    return matchesCategory && matchesTitle;
+  });
+}
+
+function filterRentals(rentals: Rental[]): Rental[] {
+  const searchText = getSearchText();
+  return rentals.filter(function (rental) {
+    const matchesCategory = rental.movie.category === activeCategory;
+    const matchesTitle = searchText === "" || rental.movie.title.toLowerCase().includes(searchText);
+    return matchesCategory && matchesTitle;
+  });
+}
+
+function formatRentalDate(value: string): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).format(new Date(value));
+}
+
+function getRentalAvailabilityText(value: string): string {
+  const availableUntil = new Date(value);
+
+  if (!isRentalAvailable(value)) {
+    return "No disponible";
+  }
+
+  return "Disponible hasta el " + formatRentalDate(value);
+}
+
+function isRentalAvailable(value: string): boolean {
+  return new Date(value).getTime() > Date.now();
+}
+
+function refreshVisibleLists(): void {
+  if (isAdmin()) {
+    renderMovieList(movieList, filterMovies(adminMovies), "crud");
+    renderRentalList(allRentalsList, filterRentals(allRentals), true);
+    return;
+  }
+
+  if (currentUser) {
+    renderMovieList(availableList, filterMovies(availableMovies), getAvailableCardMode());
+    renderUserRentalGroups(rentedList, filterRentals(rentedRentals));
+    return;
+  }
+
+  renderMovieList(availableList, filterMovies(availableMovies), "public");
+}
+
+function setActiveCategory(category: MovieCategory): void {
+  activeCategory = category;
+
+  tabButtons.forEach(function (button) {
+    button.classList.toggle("active", button.dataset.category === category);
+  });
+
+  refreshVisibleLists();
+}
+
+function createMovieCard(movie: Movie, mode: "crud" | "available" | "rented" | "public"): HTMLElement {
   const article = document.createElement("article");
   article.className = "movie-card";
 
@@ -133,7 +218,7 @@ function createMovieCard(movie: Movie, mode: "crud" | "available" | "rented"): H
   title.textContent = movie.title;
 
   const details = document.createElement("p");
-  details.textContent = movie.year + " - " + movie.genre;
+  details.textContent = movie.year + " - " + movie.genre + " - " + movie.category;
 
   const actions = document.createElement("div");
   actions.className = "card-actions";
@@ -176,18 +261,40 @@ function createMovieCard(movie: Movie, mode: "crud" | "available" | "rented"): H
   return article;
 }
 
-function createRentalCard(rental: Rental): HTMLElement {
+function createRentalCard(rental: Rental, showUser: boolean, showAvailability: boolean): HTMLElement {
   const article = createMovieCard(rental.movie, "rented");
   const info = article.querySelector(".movie-info") as HTMLDivElement;
-  const userLine = document.createElement("p");
-  userLine.className = "rental-user";
-  userLine.textContent = "Alquilada por " + rental.userEmail;
-  info.appendChild(userLine);
+  const rentedLine = document.createElement("p");
+  rentedLine.className = "rental-date";
+  rentedLine.textContent = "Alquilada el " + formatRentalDate(rental.rentedAt);
+  info.appendChild(rentedLine);
+
+  if (showAvailability) {
+    const availableLine = document.createElement("p");
+    availableLine.className = "rental-date";
+    availableLine.textContent = getRentalAvailabilityText(rental.availableUntil);
+    info.appendChild(availableLine);
+  }
+
+  if (showUser) {
+    const userLine = document.createElement("p");
+    userLine.className = "rental-user";
+    userLine.textContent = "Alquilada por " + rental.userEmail;
+    info.appendChild(userLine);
+  }
 
   return article;
 }
 
-function renderMovieList(target: HTMLDivElement, movies: Movie[], mode: "crud" | "available" | "rented"): void {
+function getAvailableCardMode(): "available" | "public" {
+  return currentUser && currentUser.role === "user" ? "available" : "public";
+}
+
+function renderMovieList(
+  target: HTMLDivElement,
+  movies: Movie[],
+  mode: "crud" | "available" | "rented" | "public"
+): void {
   target.innerHTML = "";
 
   if (movies.length === 0) {
@@ -200,7 +307,7 @@ function renderMovieList(target: HTMLDivElement, movies: Movie[], mode: "crud" |
   });
 }
 
-function renderRentalList(target: HTMLDivElement, rentals: Rental[]): void {
+function renderRentalList(target: HTMLDivElement, rentals: Rental[], showUser: boolean): void {
   target.innerHTML = "";
 
   if (rentals.length === 0) {
@@ -209,8 +316,47 @@ function renderRentalList(target: HTMLDivElement, rentals: Rental[]): void {
   }
 
   rentals.forEach(function (rental) {
-    target.appendChild(createRentalCard(rental));
+    target.appendChild(createRentalCard(rental, showUser, true));
   });
+}
+
+function renderRentalGroup(
+  target: HTMLDivElement,
+  title: string,
+  rentals: Rental[],
+  emptyMessage: string,
+  showAvailability: boolean
+): void {
+  const heading = document.createElement("h3");
+  heading.className = "rental-group-title";
+  heading.textContent = title;
+  target.appendChild(heading);
+
+  if (rentals.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty rental-group-empty";
+    empty.textContent = emptyMessage;
+    target.appendChild(empty);
+    return;
+  }
+
+  rentals.forEach(function (rental) {
+    target.appendChild(createRentalCard(rental, false, showAvailability));
+  });
+}
+
+function renderUserRentalGroups(target: HTMLDivElement, rentals: Rental[]): void {
+  target.innerHTML = "";
+
+  const availableRentals = rentals.filter(function (rental) {
+    return isRentalAvailable(rental.availableUntil);
+  });
+  const unavailableRentals = rentals.filter(function (rental) {
+    return !isRentalAvailable(rental.availableUntil);
+  });
+
+  renderRentalGroup(target, "Disponibles", availableRentals, "No hay peliculas alquiladas disponibles.", true);
+  renderRentalGroup(target, "No disponibles", unavailableRentals, "No hay peliculas alquiladas no disponibles.", false);
 }
 
 function loadMovies(): void {
@@ -227,7 +373,8 @@ function loadMovies(): void {
       return response.json();
     })
     .then(function (movies: Movie[]) {
-      renderMovieList(movieList, movies, "crud");
+      adminMovies = movies;
+      renderMovieList(movieList, filterMovies(adminMovies), "crud");
       setStatus(movies.length + " peliculas");
     })
     .catch(function () {
@@ -340,8 +487,12 @@ function resetApplicationState(): void {
   availableList.innerHTML = "";
   rentedList.innerHTML = "";
   allRentalsList.innerHTML = "";
+  adminMovies = [];
+  availableMovies = [];
+  rentedRentals = [];
+  allRentals = [];
   setStatus("Inicia sesion como admin");
-  availableStatusText.textContent = "Inicia sesion";
+  loadAvailableMovies();
   rentedStatusText.textContent = "Inicia sesion";
   allRentalsStatusText.textContent = "Inicia sesion como admin";
 }
@@ -354,7 +505,8 @@ function loadAvailableMovies(): void {
       return response.json();
     })
     .then(function (movies: Movie[]) {
-      renderMovieList(availableList, movies, "available");
+      availableMovies = movies;
+      renderMovieList(availableList, filterMovies(availableMovies), getAvailableCardMode());
       availableStatusText.textContent = movies.length + " disponibles";
     })
     .catch(function () {
@@ -374,12 +526,9 @@ function loadRentedMovies(): void {
       return response.json();
     })
     .then(function (rentals: Rental[]) {
-      const movies = rentals.map(function (rental) {
-        return rental.movie;
-      });
-
-      renderMovieList(rentedList, movies, "rented");
-      rentedStatusText.textContent = movies.length + " alquiladas";
+      rentedRentals = rentals;
+      renderUserRentalGroups(rentedList, filterRentals(rentedRentals));
+      rentedStatusText.textContent = rentedRentals.length + " alquiladas";
     })
     .catch(function () {
       rentedStatusText.textContent = "Error al cargar alquileres";
@@ -400,7 +549,8 @@ function loadAllRentals(): void {
       return response.json();
     })
     .then(function (rentals: Rental[]) {
-      renderRentalList(allRentalsList, rentals);
+      allRentals = rentals;
+      renderRentalList(allRentalsList, filterRentals(allRentals), true);
       allRentalsStatusText.textContent = rentals.length + " alquileres";
     })
     .catch(function () {
@@ -424,9 +574,7 @@ function loadDataForCurrentUser(): void {
     return;
   }
 
-  if (currentUser) {
-    loadUserData();
-  }
+  loadUserData();
 }
 
 function rentMovie(movieId: number): void {
@@ -467,5 +615,11 @@ form.addEventListener("submit", saveMovie);
 loginForm.addEventListener("submit", login);
 cancelButton.addEventListener("click", resetForm);
 logoutButton.addEventListener("click", logout);
+searchTitleInput.addEventListener("input", refreshVisibleLists);
+tabButtons.forEach(function (button) {
+  button.addEventListener("click", function () {
+    setActiveCategory(button.dataset.category as MovieCategory);
+  });
+});
 
 resetApplicationState();
